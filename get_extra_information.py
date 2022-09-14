@@ -24,6 +24,8 @@ def get_videogames_review(data_file: str = 'data/switch-games-titles.txt'):
         print(ind, videogame[0])
         if len(videogame) == 2:
             try:
+                # if ind > 15:
+                #     raise
                 reviews.append('|'.join([videogame[0], videogame[1], get_raw_html(videogame[1])]))
             except:
                 reviews.append('|'.join(videogame))
