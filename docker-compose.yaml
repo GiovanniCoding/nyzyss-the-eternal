@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  api:
+    image: api
+    restart: always
+    ports:
+     - "80:80"
+    environment:
+      - VIRTUAL_HOST=api.egiovanni.com
+      - LETSENCRYPT_HOST=api.egiovanni.com
+      - LETSENCRYPT_EMAIL=egiovanni.vo@gmail.com
+
+  meilisearch:
+    image: getmeili/meilisearch:v0.28.1
+    restart: always
+    expose:
+      - "7700"
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=${PROJECTS_PERSONAL_KEY}
+    volumes:
+      - meili:/meili_data
+
+  mariadb:
+    image: mariadb:10.9.2
+    restart: always
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${PROJECTS_PERSONAL_KEY}
+      MARIADB_USER: ${PROJECTS_PERSONAL_KEY}
+      MARIADB_PASSWORD: ${PROJECTS_PERSONAL_KEY}
+    volumes:
+      - maria:/var/lib/mysql
+
+volumes:
+  meili:
+    external: false
+  maria:
+    external: false
+  minio:
+    external: false
