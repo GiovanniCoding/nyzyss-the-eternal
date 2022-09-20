@@ -2,6 +2,7 @@ import os
 import uvicorn
 import meilisearch
 from fastapi import FastAPI, Query
+import mysql.connector as mariadb
 
 
 app = FastAPI()
@@ -28,4 +29,19 @@ async def db_search(games: str = Query(min_length=8)):
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='0.0.0.0', port=80)
-    games = '12345678'
+    # print(os.environ.get('PROJECTS_PERSONAL_KEY'))
+
+    # games = '12345678'
+    # connection = mariadb.connect(
+    #     user='root',
+    #     password=os.environ.get('PROJECTS_PERSONAL_KEY'),
+    #     host='34.136.74.202',
+    #     database='games'
+    # )
+    # cursor = connection.cursor()
+    # query = '''
+    #     SELECT game_title
+    #     FROM switch_games
+    #     WHERE id = 'cf5ae401'
+    # '''
+    # cursor.execute(query)
