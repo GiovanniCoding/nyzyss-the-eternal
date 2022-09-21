@@ -11,6 +11,13 @@ client = meilisearch.Client(
     api_key=os.environ.get('PROJECTS_PERSONAL_KEY')
 )
 
+connection = mariadb.connect(
+    user='root',
+    password=os.environ.get('PROJECTS_PERSONAL_KEY'),
+    host='34.136.74.202',
+    database='games'
+)
+
 
 @app.get("/")
 async def root():
@@ -24,24 +31,17 @@ async def meilisearch_search(collection: str = Query(min_length=3), query: str =
 
 @app.get("/db/")
 async def db_search(games: str = Query(min_length=8)):
-    print(games)
+    games = "','".join(games.split('-'))
+    cursor = connection.cursor()
+    query = '''
+        SELECT *
+        FROM switch_games
+        WHERE id IN ('{0}')
+    '''.format(games)
+    cursor.execute(query)
+    games_list = cursor.fetchmany(20)
+    return games_list
 
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='0.0.0.0', port=80)
-    # print(os.environ.get('PROJECTS_PERSONAL_KEY'))
-
-    # games = '12345678'
-    # connection = mariadb.connect(
-    #     user='root',
-    #     password=os.environ.get('PROJECTS_PERSONAL_KEY'),
-    #     host='34.136.74.202',
-    #     database='games'
-    # )
-    # cursor = connection.cursor()
-    # query = '''
-    #     SELECT game_title
-    #     FROM switch_games
-    #     WHERE id = 'cf5ae401'
-    # '''
-    # cursor.execute(query)
