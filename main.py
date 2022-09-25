@@ -2,7 +2,10 @@ import os
 import uvicorn
 import meilisearch
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector as mariadb
+
+# Model
 import pandas as pd
 from scipy import spatial
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -25,15 +28,23 @@ def create_model():
     return X, tree, data
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 client = meilisearch.Client(
-    'http://api.egiovanni.com:7700',
+    'https://api.egiovanni.com:7700',
     api_key=os.environ.get('PROJECTS_PERSONAL_KEY')
 )
 
 connection = mariadb.connect(
     user='root',
     password=os.environ.get('PROJECTS_PERSONAL_KEY'),
-    host='34.136.74.202',
+    host='35.232.158.64',
     database='games'
 )
 
@@ -66,6 +77,9 @@ async def db_search(games: str = Query(min_length=8)):
 
 @app.get('/model/')
 async def model_prediction(id: str = Query(min_length = 8)):
+    print('-------', data)
+    print('-------', data.index[data['id'] == id][0])
+
     index = data.index[data['id'] == id][0]
     game_array = X[index].toarray()[0]
     games_closest = tree.query(game_array, k=21)[1][1:]
